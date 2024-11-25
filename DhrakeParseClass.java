@@ -38,6 +38,7 @@ public class DhrakeParseClass extends GhidraScript {
 
 	@Override
 	protected void run() throws Exception {
+
 		String  className   = null;
 		Address nameAddress = this.toAddr(this.getInt(currentAddress.add(32)));
 
@@ -57,7 +58,7 @@ public class DhrakeParseClass extends GhidraScript {
 		if (className.toUpperCase().startsWith("T") || className.toUpperCase().startsWith("E")) {
 			this.log(className);
 
-			GhidraClass classNamespace = null;
+			GhidraClass classNamespace;
 
 			try {
 				this.log("Creating class %s", className);
@@ -65,6 +66,7 @@ public class DhrakeParseClass extends GhidraScript {
 						.getOrCreateNameSpace(currentProgram.getGlobalNamespace(), className, SourceType.USER_DEFINED));
 			} catch (DuplicateNameException e) {
 				this.log("Class %s already exists, stopping", className);
+				return;
 			}
 
 			StructureDataType base = new StructureDataType(className, 0);
