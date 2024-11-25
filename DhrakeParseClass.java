@@ -54,54 +54,57 @@ public class DhrakeParseClass extends GhidraScript {
 			return;
 		}
 
+		if (!className.toUpperCase().startsWith("T") && !className.toUpperCase().startsWith("E")) {
+			this.log(String.format("Expected class to be prefixed with T or E, class name given was %s.", className));
+			return;
+		}
+
 		// Create Data Structures + Methods
-		if (className.toUpperCase().startsWith("T") || className.toUpperCase().startsWith("E")) {
-			this.log(className);
+		this.log(className);
 
-			GhidraClass classNamespace;
+		GhidraClass classNamespace;
 
-			try {
-				this.log("Creating class %s", className);
-				classNamespace = NamespaceUtils.convertNamespaceToClass(currentProgram.getSymbolTable()
-						.getOrCreateNameSpace(currentProgram.getGlobalNamespace(), className, SourceType.USER_DEFINED));
-			} catch (DuplicateNameException e) {
-				this.log("Class %s already exists, stopping", className);
-				return;
-			}
+		try {
+			this.log("Creating class %s", className);
+			classNamespace = NamespaceUtils.convertNamespaceToClass(currentProgram.getSymbolTable()
+					.getOrCreateNameSpace(currentProgram.getGlobalNamespace(), className, SourceType.USER_DEFINED));
+		} catch (DuplicateNameException e) {
+			this.log("Class %s already exists, stopping", className);
+			return;
+		}
 
-			StructureDataType base = new StructureDataType(className, 0);
-			StructureDataType vtbl = new StructureDataType(className + "VT", 0);
+		StructureDataType base = new StructureDataType(className, 0);
+		StructureDataType vtbl = new StructureDataType(className + "VT", 0);
 
-			long vt = this.getInt(currentAddress);
+		long vt = this.getInt(currentAddress);
 
-			if (classNamespace != null) {
-				for (long tooDamnHigh = vt + 4 * 100; vt < tooDamnHigh; vt += 4) {
-					try {
-						long     offset     = this.getInt(this.toAddr(vt));
-						String   name       = null;
-						Address  entryPoint = this.toAddr(offset);
-						Function function   = this.getFunctionAt(entryPoint);
-						if (function == null) {
-							name = this.getSymbolAt(entryPoint).toString();
-							if (name == null) {
-								name = String.format("FUN_%08X", offset);
-							}
-							this.log(String.format("defining function at 0x%08X, name %s", offset, name));
-							function = this.createFunction(entryPoint, name);
+		if (classNamespace != null) {
+			for (long tooDamnHigh = vt + 4 * 100; vt < tooDamnHigh; vt += 4) {
+				try {
+					long     offset     = this.getInt(this.toAddr(vt));
+					String   name       = null;
+					Address  entryPoint = this.toAddr(offset);
+					Function function   = this.getFunctionAt(entryPoint);
+					if (function == null) {
+						name = this.getSymbolAt(entryPoint).toString();
+						if (name == null) {
+							name = String.format("FUN_%08X", offset);
 						}
-						if (function == null) break;
-						function.setParentNamespace(classNamespace);
-						name = function.getName();
-						this.log(String.format("adding function %s::%s", className, name));
-						vtbl.add(this.addFnType(function), 4, name, "");
-					} catch (Exception e) {
-						break;
+						this.log(String.format("defining function at 0x%08X, name %s", offset, name));
+						function = this.createFunction(entryPoint, name);
 					}
+					if (function == null) break;
+					function.setParentNamespace(classNamespace);
+					name = function.getName();
+					this.log(String.format("adding function %s::%s", className, name));
+					vtbl.add(this.addFnType(function), 4, name, "");
+				} catch (Exception e) {
+					break;
 				}
-
-				base.add(this.getCurrentProgram().getDataTypeManager().getPointer(this.putType(vtbl)), "vt", "Virtual Function Table");
-				this.putType(base);
 			}
+
+			base.add(this.getCurrentProgram().getDataTypeManager().getPointer(this.putType(vtbl)), "vt", "Virtual Function Table");
+			this.putType(base);
 		}
 	}
 }
