@@ -65,9 +65,14 @@ public class DhrakeParseClass extends GhidraScript {
 		GhidraClass classNamespace;
 
 		try {
-			this.log("Creating class %s", className);
-			classNamespace = NamespaceUtils.convertNamespaceToClass(currentProgram.getSymbolTable()
-					.getOrCreateNameSpace(currentProgram.getGlobalNamespace(), className, SourceType.USER_DEFINED));
+			classNamespace = NamespaceUtils.convertNamespaceToClass(currentProgram
+				.getSymbolTable()
+				.getOrCreateNameSpace(
+					currentProgram.getGlobalNamespace(),
+					className,
+					SourceType.USER_DEFINED
+				)
+			);
 		} catch (DuplicateNameException e) {
 			this.log("Class %s already exists, stopping", className);
 			return;
