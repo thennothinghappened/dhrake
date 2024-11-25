@@ -11,6 +11,7 @@ import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.GhidraClass;
 import ghidra.program.model.mem.MemoryAccessException;
 import ghidra.program.model.symbol.SourceType;
+import ghidra.program.model.symbol.Symbol;
 import ghidra.util.exception.DuplicateNameException;
 
 public class DhrakeParseClass extends GhidraScript {
@@ -89,17 +90,25 @@ public class DhrakeParseClass extends GhidraScript {
 
 		for (long tooDamnHigh = vt + 4 * 100; vt < tooDamnHigh; vt += 4) {
 			try {
+
 				long     offset     = this.getInt(this.toAddr(vt));
 				String   name       = null;
 				Address  entryPoint = this.toAddr(offset);
 				Function function   = this.getFunctionAt(entryPoint);
+
 				if (function == null) {
-					name = this.getSymbolAt(entryPoint).toString();
-					if (name == null) {
+
+					Symbol funcSymbol = this.getSymbolAt(entryPoint);
+
+					if (funcSymbol != null) {
+						name = funcSymbol.toString();
+					} else {
 						name = String.format("FUN_%08X", offset);
 					}
+
 					this.log(String.format("defining function at 0x%08X, name %s", offset, name));
 					function = this.createFunction(entryPoint, name);
+
 				}
 
 				if (function == null) {
