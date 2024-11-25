@@ -107,7 +107,15 @@ public class DhrakeParseClass extends GhidraScript {
 				this.log(String.format("adding function %s::%s", className, name));
 				vtbl.add(this.addFnType(function), 4, name, "");
 			} catch (Exception e) {
+
+				this.log(String.format("Failed to add function: %s", e));
+
+				for (StackTraceElement element : e.getStackTrace()) {
+					this.log(String.format("\t%s", element));
+				}
+
 				break;
+
 			}
 		}
 
