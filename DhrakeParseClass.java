@@ -118,7 +118,8 @@ public class DhrakeParseClass extends GhidraScript {
 				function.setParentNamespace(classNamespace);
 				name = function.getName();
 				this.log(String.format("adding function %s::%s", className, name));
-				vtbl.add(this.addFnType(function), 4, name, "");
+				vtbl.add(new Pointer32DataType(this.addFnType(function)), name, "");
+
 			} catch (Exception e) {
 
 				this.log(String.format("Failed to add function: %s", e));
