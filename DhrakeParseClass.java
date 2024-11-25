@@ -60,7 +60,7 @@ public class DhrakeParseClass extends GhidraScript {
 		}
 
 		// Create Data Structures + Methods
-		this.log(className);
+		this.log("Creating class %s", className);
 
 		GhidraClass classNamespace;
 
