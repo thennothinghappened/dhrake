@@ -56,7 +56,7 @@ public class DhrakeParseClass extends GhidraScript {
 		}
 
 		if (!className.toUpperCase().startsWith("T") && !className.toUpperCase().startsWith("E")) {
-			this.log(String.format("Expected class to be prefixed with T or E, class name given was %s.", className));
+			this.log("Expected class to be prefixed with T or E, class name given was %s.", className);
 			return;
 		}
 
@@ -106,7 +106,7 @@ public class DhrakeParseClass extends GhidraScript {
 						name = String.format("FUN_%08X", offset);
 					}
 
-					this.log(String.format("defining function at 0x%08X, name %s", offset, name));
+					this.log("defining function at 0x%08X, name %s", offset, name);
 					function = this.createFunction(entryPoint, name);
 
 				}
@@ -117,15 +117,15 @@ public class DhrakeParseClass extends GhidraScript {
 
 				function.setParentNamespace(classNamespace);
 				name = function.getName();
-				this.log(String.format("adding function %s::%s", className, name));
+				this.log("adding function %s::%s", className, name);
 				vtbl.add(new Pointer32DataType(this.addFnType(function)), name, "");
 
 			} catch (Exception e) {
 
-				this.log(String.format("Failed to add function: %s", e));
+				this.log("Failed to add function: %s", e);
 
 				for (StackTraceElement element : e.getStackTrace()) {
-					this.log(String.format("\t%s", element));
+					this.log("\t%s", element);
 				}
 
 				break;
